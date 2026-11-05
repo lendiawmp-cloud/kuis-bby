@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kuis Kesukaan Pacar Tersayang ❤️</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Family -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Sacramento&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Canvas Confetti & html2canvas -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff1f2',
+              100: '#ffe4e6',
+              200: '#fecdd3',
+              300: '#fda4af',
+              400: '#fb7185',
+              500: '#f43f5e',
+              600: '#e11d48',
+            },
+            pastel: {
+              pink: '#FFD1DC',
+              rose: '#FFE4E1',
+              peach: '#FFDAB9',
+              purple: '#E6E6FA',
+              cream: '#FFF9F5'
+            }
+          },
+          fontFamily: {
+            fredoka: ['Fredoka', 'sans-serif'],
+            nunito: ['Nunito', 'sans-serif'],
+            handwriting: ['Sacramento', 'cursive'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #fbcfe8 0%, #ffe4e6 50%, #fed7aa 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Floating Heart Background Animation */
+    .bg-hearts {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .heart-particle {
+      position: absolute;
+      list-style: none;
+      display: block;
+      width: 20px;
+      height: 20px;
+      background: rgba(244, 63, 94, 0.25);
+      bottom: -150px;
+      animation: animateHeart 20s linear infinite;
+      clip-path: path("M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z");
+    }
+
+    @keyframes animateHeart {
+      0% {
+        transform: translateY(0) rotate(0deg) scale(0.5);
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(-1200px) rotate(720deg) scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    /* Custom Shake Animation for wrong answers */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-12px) rotate(-3deg); }
+      40%, 80% { transform: translateX(12px) rotate(3deg); }
+    }
+    .animate-shake {
+      animation: shake 0.5s ease-in-out;
+    }
+
+    /* Glassmorphism Effect */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 20px 40px rgba(225, 29, 72, 0.12);
+    }
+
+    /* Custom Pulse Glow */
+    .glow-effect {
+      box-shadow: 0 0 20px rgba(244, 63, 94, 0.4);
+    }
+
+    /* Heart Floating Target for Game 2 */
+    .floating-target {
+      position: absolute;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.2s ease;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    }
+    .floating-target:hover {
+      transform: scale(1.2) rotate(10deg);
+    }
+
+    /* Scratch Card Container */
+    .scratch-container {
+      position: relative;
+      user-select: none;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #ffe4e6;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #fb7185;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body class="relative flex flex-col justify-between items-center min-h-screen p-3 md:p-6 text-slate-800">
+
+  <!-- Floating Background Hearts -->
+  <ul class="bg-hearts" id="bgHearts"></ul>
+
+  <!-- Navigation Bar / Audio Toggle -->
+  <header class="w-full max-w-2xl flex justify-between items-center z-20 mb-4">
+    <div class="flex items-center space-x-2 bg-white/80 px-4 py-2 rounded-full shadow-sm backdrop-blur-md">
+      <span class="text-rose-500 font-bold text-lg font-fredoka"><i class="fa-solid fa-heart animate-pulse mr-1"></i> LoveQuiz</span>
+    </div>
+    
+    <div class="flex items-center space-x-2">
+      <!-- Music Toggle Button -->
+      <button id="musicBtn" onclick="toggleMusic()" class="bg-white/80 hover:bg-white text-rose-500 hover:text-rose-600 p-3 rounded-full shadow-md backdrop-blur-md transition-all transform active:scale-95 flex items-center justify-center w-11 h-11">
+        <i id="musicIcon" class="fa-solid fa-music text-lg"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="w-full max-w-2xl z-10 my-auto">
+
+    <!-- WELCOME / START SCREEN -->
+    <section id="welcomeScreen" class="glass-card rounded-3xl p-6 md:p-10 text-center transition-all duration-500 transform">
+      <div class="relative inline-block mb-4">
+        <div class="w-24 h-24 md:w-32 md:h-32 bg-rose-100 rounded-full flex items-center justify-center mx-auto shadow-inner border-4 border-rose-200">
+          <i class="fa-solid fa-face-smile-wink text-5xl md:text-6xl text-rose-500 animate-bounce"></i>
+        </div>
+        <span class="absolute bottom-0 right-0 bg-rose-500 text-white p-2 rounded-full text-xs shadow-lg font-bold">
+          <i class="fa-solid fa-sparkles"></i>
+        </span>
+      </div>
+
+      <h1 class="text-3xl md:text-4xl font-extrabold font-fredoka text-rose-600 mb-2">
+        Kuis Seberapa Kenal Kamu Sama Aku? ❤️
+      </h1>
+      <p class="text-slate-600 font-medium mb-6 text-sm md:text-base leading-relaxed">
+        Hai Sayang! Coba deh jawab 6 pertanyaan penting ini. Awas ya, banyak pilihan jebakan yang bisa bikin salah! 😜
+      </p>
+
+      <div class="bg-rose-50/80 rounded-2xl p-4 mb-6 border border-rose-200 text-left text-xs md:text-sm text-slate-700 space-y-2">
+        <p class="font-bold text-rose-600 flex items-center">
+          <i class="fa-solid fa-circle-info mr-2"></i> Aturan Main:
+        </p>
+        <ul class="list-disc list-inside space-y-1 pl-1 text-slate-600">
+          <li>Pilih 1 jawaban paling tepat dari 4 pilihan.</li>
+          <li>Hati-hati dengan pilihan ganda yang menjebak!</li>
+          <li>Selesaikan Kuis 1 untuk membuka <span class="font-bold text-rose-500">Mini Game Rahasia Game 2</span>!</li>
+        </ul>
+      </div>
+
+      <button onclick="startQuiz()" class="w-full py-4 px-8 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-fredoka text-lg md:text-xl rounded-2xl shadow-lg hover:shadow-rose-300/50 transition-all transform hover:-translate-y-1 active:translate-y-0 glow-effect">
+        Mulai Kuis Cinta! <i class="fa-solid fa-arrow-right ml-2"></i>
+      </button>
+    </section>
+
+    <!-- GAME 1: QUIZ CONTAINER -->
+    <section id="quizScreen" class="glass-card rounded-3xl p-6 md:p-8 hidden transition-all duration-300">
+      
+      <!-- Progress Bar & Top Meta -->
+      <div class="mb-6">
+        <div class="flex justify-between items-center text-sm font-semibold text-rose-600 mb-2">
+          <span id="questionCounter" class="bg-rose-100 px-3 py-1 rounded-full border border-rose-200">
+            Pertanyaan 1 dari 6
+          </span>
+          <span id="scoreTracker" class="text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-full border border-amber-200 font-bold">
+            <i class="fa-solid fa-star text-amber-500 mr-1"></i> Skor: <span id="currentScore">0</span>
+          </span>
+        </div>
+        
+        <!-- Progress Bar Background -->
+        <div class="w-full bg-rose-100 h-3 rounded-full overflow-hidden p-0.5 border border-rose-200">
+          <div id="progressBar" class="bg-gradient-to-r from-rose-400 to-pink-500 h-full rounded-full transition-all duration-500 w-1/6"></div>
+        </div>
+      </div>
+
+      <!-- Question Box -->
+      <div class="bg-white/90 rounded-2xl p-5 md:p-6 shadow-sm border border-rose-100 mb-6 text-center">
+        <span id="questionCategory" class="inline-block text-xs font-bold text-pink-500 tracking-wider uppercase mb-1">
+          Kategori: Rahasia Asmara
+        </span>
+        <h2 id="questionText" class="text-xl md:text-2xl font-bold font-fredoka text-slate-800 leading-snug">
+          Pertanyaan akan muncul di sini...
+        </h2>
+      </div>
+
+      <!-- Options Grid -->
+      <div id="optionsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+        <!-- Buttons injected dynamically -->
+      </div>
+
+      <!-- Feedback Banner (Correct / Wrong message) -->
+      <div id="feedbackBox" class="hidden p-4 rounded-2xl text-center text-sm font-bold transition-all duration-300 mb-2">
+        <p id="feedbackText"></p>
+      </div>
+
+      <!-- Next Button Container -->
+      <div class="flex justify-end mt-4">
+        <button id="nextBtn" onclick="nextQuestion()" class="hidden py-3 px-6 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl shadow-md transition-all transform active:scale-95 items-center">
+          Lanjut <i class="fa-solid fa-chevron-right ml-2"></i>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- RESULT SUMMARY MODAL / SCREEN -->
+    <section id="resultScreen" class="glass-card rounded-3xl p-6 md:p-8 text-center hidden transition-all duration-500">
+      
+      <div id="captureArea" class="p-4 rounded-2xl bg-gradient-to-b from-white/90 to-rose-50/90 border border-rose-100">
+        <div class="text-rose-500 font-handwriting text-3xl font-bold mb-1">
+          Sertifikat Cinta
+        </div>
+        <h2 class="text-2xl md:text-3xl font-extrabold font-fredoka text-slate-800 mb-2">
+          Hasil Kuis Pacar Tersayang
+        </h2>
+
+        <!-- Score Badge -->
+        <div class="my-4 relative inline-block">
+          <div class="w-28 h-28 md:w-36 md:h-36 rounded-full bg-gradient-to-tr from-rose-400 to-pink-500 text-white flex flex-col items-center justify-center mx-auto shadow-xl border-4 border-white">
+            <span class="text-xs uppercase tracking-widest font-semibold opacity-90">Skor Kamu</span>
+            <span id="finalScore" class="text-4xl md:text-5xl font-black font-fredoka">100%</span>
+          </div>
+          <span id="badgeIcon" class="absolute -bottom-2 -right-2 text-3xl bg-white p-2 rounded-full shadow-md">🏆</span>
+        </div>
+
+        <h3 id="predicateTitle" class="text-xl md:text-2xl font-bold text-rose-600 font-fredoka mb-2">
+          Pacar Terbaik Se-Alam Raya! ❤️
+        </h3>
+        <p id="predicateDesc" class="text-slate-600 text-sm md:text-base mb-4 px-2 leading-relaxed">
+          Wah luar biasa! Kamu beneran perhatian dan ingat semua detail kecil tentang aku. So sweet banget sih!
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+        <button onclick="shareResult()" class="py-3 px-4 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center text-sm">
+          <i class="fa-solid fa-download mr-2"></i> Simpan / Cetak Hasil
+        </button>
+        <button onclick="restartQuiz()" class="py-3 px-4 bg-rose-100 hover:bg-rose-200 text-rose-600 font-bold rounded-xl shadow-sm transition-all flex items-center justify-center text-sm">
+          <i class="fa-solid fa-rotate-left mr-2"></i> Coba Kuis Lagi
+        </button>
+      </div>
+
+      <!-- Transition to Game 2 -->
+      <div class="mt-6 pt-6 border-t border-rose-200">
+        <div class="bg-gradient-to-r from-pink-500 to-rose-500 rounded-2xl p-4 text-white text-left flex items-center justify-between shadow-lg">
+          <div>
+            <span class="bg-white/20 text-xs px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">Bonus Game</span>
+            <h4 class="font-fredoka text-lg font-bold">Buka Mini Game Ke-2! 🎁</h4>
+            <p class="text-xs text-rose-100">Tangkap hati beterbangan & buka pesan rahasia khusus buat kamu!</p>
+          </div>
+          <button onclick="goToGame2()" class="ml-3 py-2.5 px-4 bg-white text-rose-600 font-bold rounded-xl shadow hover:bg-rose-50 transition transform hover:scale-105 shrink-0 text-xs md:text-sm">
+            Main Sekarang <i class="fa-solid fa-gamepad ml-1"></i>
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- GAME 2: MINI GAME "TANGKAP HATI & PESAN RAHASIA" -->
+    <section id="game2Screen" class="glass-card rounded-3xl p-6 md:p-8 hidden transition-all duration-500">
+      
+      <!-- Top Bar Game 2 -->
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <span class="text-xs font-bold bg-pink-100 text-pink-600 px-3 py-1 rounded-full">Mini Game 2</span>
+          <h2 class="text-xl md:text-2xl font-bold font-fredoka text-rose-600 mt-1">
+            Tangkap Hati Cinta! ❤️
+          </h2>
+        </div>
+        <button onclick="backToResult()" class="text-xs text-slate-500 hover:text-rose-500 underline font-semibold">
+          <i class="fa-solid fa-arrow-left mr-1"></i> Kembali
+        </button>
+      </div>
+
+      <p class="text-xs md:text-sm text-slate-600 mb-4">
+        Klik/tap pada hati yang beterbangan di area game bawah ini untuk mengumpulkan pesan rahasia manis dariku! (<span id="caughtCount" class="font-bold text-rose-500">0</span>/5 Terkumpul)
+      </p>
+
+      <!-- Interactive Game Area Canvas/Box -->
+      <div id="heartCanvas" class="relative w-full h-64 md:h-72 bg-gradient-to-b from-rose-50 to-pink-100 rounded-2xl border-2 border-dashed border-rose-300 overflow-hidden mb-6 shadow-inner">
+        <div id="gameInstruction" class="absolute inset-0 flex items-center justify-center text-center p-4 text-rose-400 font-semibold text-sm pointer-events-none">
+          <p><i class="fa-solid fa-hand-pointer animate-bounce mr-1"></i> Sentuh hati yang bermunculan di sini!</p>
+        </div>
+      </div>
+
+      <!-- Love Notes Revealed Area -->
+      <div class="bg-white/90 rounded-2xl p-4 border border-rose-200">
+        <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center">
+          <i class="fa-solid fa-envelope-open-text text-rose-500 mr-2"></i> Pesan Rahasia Yang Terbuka:
+        </h3>
+        
+        <div id="loveNotesList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+          <p class="text-xs text-slate-400 italic text-center py-4">Belum ada pesan yang ditangkap. Mulai klik hati di atas!</p>
+        </div>
+      </div>
+
+      <!-- Surprise Envelope Trigger -->
+      <div id="specialRewardBox" class="hidden mt-6 text-center animate-fade-in space-y-3">
+        <button onclick="openFinalSurpriseModal()" class="w-full py-3.5 px-6 bg-gradient-to-r from-amber-400 to-rose-400 hover:from-amber-500 hover:to-rose-500 text-white font-fredoka text-base rounded-xl shadow-lg transition-all transform hover:scale-102 flex items-center justify-center">
+          <i class="fa-solid fa-gift text-xl mr-2 animate-bounce"></i> Buka Surat Cinta Spesial Terakhir!
+        </button>
+        <button onclick="goToGame3()" class="w-full py-3.5 px-6 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-fredoka text-base rounded-xl shadow-lg transition-all transform hover:scale-102 flex items-center justify-center">
+          Lanjut Ke Game 3: Tebak Hadiah Akhir! 🎁 <i class="fa-solid fa-arrow-right ml-2"></i>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- GAME 3: TEBAK HADIAH AKHIR -->
+    <section id="game3Screen" class="glass-card rounded-3xl p-6 md:p-8 hidden transition-all duration-500 text-center">
+      
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <span class="text-xs font-bold bg-purple-100 text-purple-600 px-3 py-1 rounded-full">Mini Game 3</span>
+          <h2 class="text-xl md:text-2xl font-bold font-fredoka text-purple-600 mt-1">
+            Tebak & Buka Hadiah Akhir! 🎁
+          </h2>
+        </div>
+        <button onclick="backToGame2()" class="text-xs text-slate-500 hover:text-purple-500 underline font-semibold">
+          <i class="fa-solid fa-arrow-left mr-1"></i> Kembali
+        </button>
+      </div>
+
+      <p class="text-xs md:text-sm text-slate-600 mb-6">
+        Pilih salah satu kotak hadiah misteri di bawah ini untuk mengetahui hadiah spesial dari aku!
+      </p>
+
+      <!-- Gift Boxes Grid -->
+      <div id="giftBoxesGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+        <!-- Gift Boxes generated dynamically -->
+      </div>
+
+      <!-- Claimed Gift Card (Hidden at first) -->
+      <div id="giftClaimCard" class="hidden bg-gradient-to-br from-amber-50 via-rose-50 to-pink-100 rounded-2xl p-6 border-2 border-amber-300 shadow-xl text-center relative overflow-hidden animate-fade-in">
+        <span class="absolute top-2 right-3 text-xs bg-amber-400 text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+          Voucher Resmi
+        </span>
+
+        <div id="rewardIcon" class="text-5xl md:text-6xl my-2 animate-bounce">🍡</div>
+        <h3 id="rewardTitle" class="text-2xl font-black font-fredoka text-rose-600 mb-1">Jajan Mochi</h3>
+        <p id="rewardDesc" class="text-xs md:text-sm text-slate-600 mb-4 font-medium px-2">
+          Selamat! Kamu berhak dapet traktiran Jajan Mochi kenyal & manis sepuasnya bareng aku! 🍡✨
+        </p>
+
+        <a id="waClaimBtn" href="#" target="_blank" class="inline-flex items-center justify-center w-full py-3 px-6 bg-emerald-500 hover:bg-emerald-600 text-white font-bold font-fredoka rounded-xl shadow-lg transition-all transform hover:scale-102 active:scale-95 text-sm md:text-base">
+          <i class="fa-brands fa-whatsapp text-xl mr-2"></i> Klaim Hadiah Ini ke Ayang!
+        </a>
+
+        <button onclick="resetGiftBoxes()" class="mt-3 text-xs text-slate-500 hover:text-rose-500 underline block mx-auto">
+          Coba Pilih Kotak Lain 🔄
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- FINAL SURPRISE MODAL -->
+  <div id="surpriseModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity duration-300">
+    <div class="glass-card bg-white max-w-md w-full rounded-3xl p-6 md:p-8 text-center relative border-4 border-rose-300 shadow-2xl transform transition-all scale-95 opacity-0" id="modalContent">
+      <button onclick="closeSurpriseModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="w-20 h-20 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4 text-rose-500 text-4xl shadow-inner">
+        💌
+      </div>
+
+      <h3 class="text-2xl font-bold font-fredoka text-rose-600 mb-2">Pesan Spesial Buat Kamu ❤️</h3>
+      
+      <div class="bg-rose-50/80 p-4 rounded-2xl text-left border border-rose-200 text-slate-700 text-sm leading-relaxed mb-6 space-y-2 font-medium">
+        <p>Makasih ya udah mainin kuis dan mini game ini sampai habis! 🥰</p>
+        <p>Apapun hasil kuisnya, kamu tetap orang paling spesial dan berharga buat aku. Tetap sama-sama terus ya sayang! I Love You More Every Day! 💖✨</p>
+      </div>
+
+      <button onclick="closeSurpriseModal()" class="w-full py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl shadow-md transition">
+        Peluk Dulu Dari Jauh! 🤗
+      </button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="w-full max-w-2xl text-center z-10 my-4">
+    <p class="text-xs text-rose-700/70 font-semibold">
+      Dibuat dengan <i class="fa-solid fa-heart text-rose-500"></i> khusus untuk pacar tersayang
+    </p>
+  </footer>
+
+  <!-- SOUND / AUDIO SYSTEM & GAME LOGIC -->
+  <script>
+    /* ===================================================
+       1. DATA QUIZ & CONFIGURATION
+       =================================================== */
+    const quizData = [
+      {
+        category: "Minuman Favorit ☕",
+        question: "Kopi kesukaan aku apa?",
+        correct: "Cappuccino",
+        options: ["Matcha Latte", "Cappuccino", "Espresso", "Kopi Kenangan Mantan"],
+        teaseMsg: "Tetot! Masa ga ingat sih sayang? Kopi kesukaan aku kan Cappuccino! 😜"
+      },
+      {
+        category: "Koleksi Kesayangan 🧸",
+        question: "Aku punya boneka, namanya siapa?",
+        correct: "Mochio",
+        options: ["Mochie", "Mochi", "Mochio", "Cimory"],
+        teaseMsg: "Salahhh! Namanya Mochio tau, jangan ketukar sama Mochi / Mochie dong! 🤪"
+      },
+      {
+        category: "Kuliner Favorit 🍳",
+        question: "Makanan kesukaan aku apa?",
+        correct: "Nasi Goreng Viva",
+        options: ["Nasi Goreng Spesial", "Nasi Goreng Viva", "Seblak Pedas", "Nasi Goreng Solaria"],
+        teaseMsg: "Yeeu salah! Jawaban yang bener tuh Nasi Goreng Viva langganan kita! 😋"
+      },
+      {
+        category: "Ketakutan Terbesar 🦎",
+        question: "Aku paling takut sama hewan apa?",
+        correct: "Cicak",
+        options: ["Kecoa Terbang", "Buaya Darat", "Cicak", "Ular"],
+        teaseMsg: "Bukan itu! Hewan yang bikin aku merinding geli tuh Cicak! 😱"
+      },
+      {
+        category: "Dunia Gaming 🎮",
+        question: "Tim esports kesukaan aku apa?",
+        correct: "BTR",
+        options: ["RRQ", "EVOS", "ONIC", "BTR"],
+        teaseMsg: "Tetot! Masa lupa tim jagoan aku? Jawabannya BTR (Bigetron)! 🔴"
+      },
+      {
+        category: "Segar-Segar 🧃",
+        question: "Minuman kesukaan aku apa?",
+        correct: "Mogu Mogu",
+        options: ["Mixue", "Teh Poci", "Mogu Mogu", "Chatime"],
+        teaseMsg: "Hampir bener tapi salah! Minuman segar favorit aku Mogu Mogu yang ada jelly-nya! 🧃"
+      }
+    ];
+
+    const loveMessages = [
+      "Makasih udah selalu sabar dan ngertiin aku ya sayang! 💕",
+      "Kamu itu alasan kenapa hari-hariku selalu penuh senyuman. 🥰",
+      "Janji ya kita bakal terus kulineran makanan enak bareng! 🍜",
+      "Setiap detik sama kamu itu moments terfavorit dalam hidup aku. ✨",
+      "I love you more than Cappuccino & Mogu Mogu combined! 💖"
+    ];
+
+    /* State Variables */
+    let currentQuestionIdx = 0;
+    let score = 0;
+    let answered = false;
+    let isMusicPlaying = false;
+    let audioCtx = null;
+    let caughtHeartsCount = 0;
+    let heartSpawnInterval = null;
+
+    /* Sound Effects Generator via Web Audio API (No External Audio File Issues) */
+    function playSound(type) {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'correct') {
+          // Happy Arpeggio Sound
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+          osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2); // G5
+          osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.3); // C6
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+          osc.start(now);
+          osc.stop(now + 0.5);
+        } else if (type === 'wrong') {
+          // Low Buzz / Wrong Sound
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(180, now);
+          osc.frequency.linearRampToValueAtTime(110, now + 0.3);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+          osc.start(now);
+          osc.stop(now + 0.3);
+        } else if (type === 'pop') {
+          // Pop sound for catching heart
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(400, now);
+          osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+          gain.gain.setValueAtTime(0.4, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        }
+      } catch (e) {
+        console.log("Audio not supported or blocked");
+      }
+    }
+
+    /* Background Music Generator (Cute Chiptune Melody loop via Synthesizer) */
+    let bgMusicInterval = null;
+    function toggleMusic() {
+      const btn = document.getElementById('musicBtn');
+      const icon = document.getElementById('musicIcon');
+
+      if (!isMusicPlaying) {
+        isMusicPlaying = true;
+        btn.classList.add('bg-rose-500', 'text-white');
+        btn.classList.remove('bg-white/80', 'text-rose-500');
+        
+        // Start playing gentle romantic melody loop
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const notes = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63, 349.23, 440.00];
+        let noteIdx = 0;
+
+        bgMusicInterval = setInterval(() => {
+          if (!isMusicPlaying) return;
+          try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(notes[noteIdx], audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.4);
+            noteIdx = (noteIdx + 1) % notes.length;
+          } catch(e){}
+        }, 500);
+
+      } else {
+        isMusicPlaying = false;
+        btn.classList.remove('bg-rose-500', 'text-white');
+        btn.classList.add('bg-white/80', 'text-rose-500');
+        if (bgMusicInterval) clearInterval(bgMusicInterval);
+      }
+    }
+
+    /* Floating Background Particle Hearts Generator */
+    function createBgHearts() {
+      const container = document.getElementById('bgHearts');
+      for (let i = 0; i < 15; i++) {
+        const li = document.createElement('li');
+        li.classList.add('heart-particle');
+        li.style.left = `${Math.random() * 100}%`;
+        li.style.animationDelay = `${Math.random() * 15}s`;
+        li.style.animationDuration = `${12 + Math.random() * 10}s`;
+        const size = 15 + Math.random() * 20;
+        li.style.width = `${size}px`;
+        li.style.height = `${size}px`;
+        container.appendChild(li);
+      }
+    }
+
+    /* ===================================================
+       2. GAME 1: QUIZ SYSTEM LOGIC
+       =================================================== */
+
+    function startQuiz() {
+      document.getElementById('welcomeScreen').classList.add('hidden');
+      document.getElementById('quizScreen').classList.remove('hidden');
+      currentQuestionIdx = 0;
+      score = 0;
+      document.getElementById('currentScore').innerText = score;
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      answered = false;
+      const q = quizData[currentQuestionIdx];
+
+      // Update Meta
+      document.getElementById('questionCounter').innerText = `Pertanyaan ${currentQuestionIdx + 1} dari ${quizData.length}`;
+      document.getElementById('progressBar').style.width = `${((currentQuestionIdx + 1) / quizData.length) * 100}%`;
+      document.getElementById('questionCategory').innerText = q.category;
+      document.getElementById('questionText').innerText = q.question;
+
+      // Hide feedback & next button
+      const feedbackBox = document.getElementById('feedbackBox');
+      feedbackBox.classList.add('hidden');
+      feedbackBox.className = "hidden p-4 rounded-2xl text-center text-sm font-bold transition-all duration-300 mb-2";
+      document.getElementById('nextBtn').classList.add('hidden');
+
+      // Shuffle options copy (so location changes slightly if replayed)
+      const optionsContainer = document.getElementById('optionsContainer');
+      optionsContainer.innerHTML = '';
+
+      // Render buttons
+      q.options.forEach((opt) => {
+        const btn = document.createElement('button');
+        btn.className = "p-4 rounded-2xl bg-white hover:bg-rose-50 border-2 border-rose-100 hover:border-rose-300 text-slate-700 font-bold transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-left shadow-sm flex items-center justify-between group";
+        btn.onclick = () => checkAnswer(opt, btn);
+        btn.innerHTML = `
+          <span>${opt}</span>
+          <i class="fa-regular fa-circle-dot text-rose-300 group-hover:text-rose-500 transition-colors"></i>
+        `;
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selectedOpt, btnElement) {
+      if (answered) return;
+      answered = true;
+
+      const q = quizData[currentQuestionIdx];
+      const feedbackBox = document.getElementById('feedbackBox');
+      const feedbackText = document.getElementById('feedbackText');
+      const quizContainer = document.getElementById('quizScreen');
+
+      const allButtons = document.getElementById('optionsContainer').children;
+
+      if (selectedOpt === q.correct) {
+        // CORRECT ANSWER
+        playSound('correct');
+        score += 100 / quizData.length;
+        document.getElementById('currentScore').innerText = Math.round(score);
+
+        btnElement.classList.remove('bg-white', 'border-rose-100');
+        btnElement.classList.add('bg-emerald-100', 'border-emerald-400', 'text-emerald-800');
+        btnElement.querySelector('i').className = "fa-solid fa-circle-check text-emerald-500 text-lg";
+
+        feedbackBox.className = "p-4 rounded-2xl text-center text-sm font-bold transition-all duration-300 mb-2 bg-emerald-100 text-emerald-800 border border-emerald-300 animate-bounce";
+        feedbackText.innerHTML = `Pinter banget pacar aku! 😍 Jawabannya bener: <span class="underline">${q.correct}</span>`;
+
+        // Confetti Burst for correct answer
+        confetti({
+          particleCount: 40,
+          spread: 60,
+          origin: { y: 0.7 },
+          colors: ['#f43f5e', '#fb7185', '#ffd1dc']
+        });
+
+      } else {
+        // WRONG ANSWER
+        playSound('wrong');
+
+        // Shake Effect on Quiz Card
+        quizContainer.classList.add('animate-shake');
+        setTimeout(() => quizContainer.classList.remove('animate-shake'), 500);
+
+        btnElement.classList.remove('bg-white', 'border-rose-100');
+        btnElement.classList.add('bg-rose-100', 'border-rose-400', 'text-rose-800');
+        btnElement.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-500 text-lg";
+
+        // Highlight correct one
+        Array.from(allButtons).forEach(b => {
+          if (b.innerText.trim().includes(q.correct)) {
+            b.classList.add('ring-2', 'ring-emerald-400', 'bg-emerald-50');
+          }
+        });
+
+        feedbackBox.className = "p-4 rounded-2xl text-center text-sm font-bold transition-all duration-300 mb-2 bg-rose-100 text-rose-800 border border-rose-300";
+        feedbackText.innerText = q.teaseMsg;
+      }
+
+      feedbackBox.classList.remove('hidden');
+      document.getElementById('nextBtn').classList.remove('hidden');
+      document.getElementById('nextBtn').classList.add('flex');
+    }
+
+    function nextQuestion() {
+      currentQuestionIdx++;
+      if (currentQuestionIdx < quizData.length) {
+        loadQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      document.getElementById('quizScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.remove('hidden');
+
+      const finalScoreRound = Math.round(score);
+      document.getElementById('finalScore').innerText = `${finalScoreRound}%`;
+
+      const title = document.getElementById('predicateTitle');
+      const desc = document.getElementById('predicateDesc');
+      const badge = document.getElementById('badgeIcon');
+
+      if (finalScoreRound === 100) {
+        title.innerText = "Pacar Terbaik Se-Alam Raya! ❤️";
+        desc.innerText = "Sempurna 100%! Kamu beneran inget semua hal tentang aku. Nanti dapet hadiah peluk hangat deh! 😘";
+        badge.innerText = "👑";
+        
+        // Massive Confetti
+        confetti({ particleCount: 100, spread: 100, origin: { y: 0.5 } });
+      } else if (finalScoreRound >= 70) {
+        title.innerText = "Pacar Penyayang & Perhatian! 💕";
+        desc.innerText = "Skor kamu bagus banget! Cuma salah dikit gara-gara jebakannya aja kok. I love you! 🥰";
+        badge.innerText = "🥇";
+      } else {
+        title.innerText = "Perlu Remedial Kencan Nih! 😜";
+        desc.innerText = "Waduh tetot! Masih ada yang lupa nih. Yuk kencan lagi biar kamu makin hafal sama kesukaan aku! ☕🍟";
+        badge.innerText = "📚";
+      }
+    }
+
+    function restartQuiz() {
+      document.getElementById('resultScreen').classList.add('hidden');
+      startQuiz();
+    }
+
+    function shareResult() {
+      const capture = document.getElementById('captureArea');
+      html2canvas(capture, { backgroundColor: null }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'sertifikat-cinta-kuis.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+
+    /* ===================================================
+       3. GAME 2: CATCHING HEARTS & REVEALING LOVE NOTES
+       =================================================== */
+
+    function initGame2() {
+      caughtHeartsCount = 0;
+      document.getElementById('caughtCount').innerText = caughtHeartsCount;
+      document.getElementById('loveNotesList').innerHTML = '<p class="text-xs text-slate-400 italic text-center py-4">Belum ada pesan yang ditangkap. Mulai klik hati di atas!</p>';
+      document.getElementById('specialRewardBox').classList.add('hidden');
+      
+      const canvas = document.getElementById('heartCanvas');
+      // Clear existing floating hearts
+      const existing = canvas.querySelectorAll('.floating-target');
+      existing.forEach(el => el.remove());
+
+      if (heartSpawnInterval) clearInterval(heartSpawnInterval);
+
+      // Spawn floating hearts periodically
+      heartSpawnInterval = setInterval(spawnFloatingHeart, 1200);
+      spawnFloatingHeart();
+      spawnFloatingHeart();
+    }
+
+    function spawnFloatingHeart() {
+      const canvas = document.getElementById('heartCanvas');
+      if (!canvas || document.getElementById('game2Screen').classList.contains('hidden')) return;
+
+      const heart = document.createElement('div');
+      heart.className = 'floating-target text-3xl md:text-4xl animate-bounce';
+      heart.innerText = '💖';
+      
+      const maxX = canvas.clientWidth - 50;
+      const maxY = canvas.clientHeight - 50;
+      
+      const randomX = Math.max(10, Math.floor(Math.random() * maxX));
+      const randomY = Math.max(10, Math.floor(Math.random() * maxY));
+
+      heart.style.left = `${randomX}px`;
+      heart.style.top = `${randomY}px`;
+
+      heart.onclick = () => catchHeart(heart);
+
+      canvas.appendChild(heart);
+
+      // Auto remove after 4 seconds if not caught
+      setTimeout(() => {
+        if (heart.parentNode === canvas) {
+          heart.remove();
+        }
+      }, 4000);
+    }
+
+    function catchHeart(heartElement) {
+      playSound('pop');
+      heartElement.remove();
+
+      if (caughtHeartsCount < loveMessages.length) {
+        const msg = loveMessages[caughtHeartsCount];
+        caughtHeartsCount++;
+        document.getElementById('caughtCount').innerText = caughtHeartsCount;
+
+        const list = document.getElementById('loveNotesList');
+        if (caughtHeartsCount === 1) {
+          list.innerHTML = '';
+        }
+
+        const note = document.createElement('div');
+        note.className = 'p-3 bg-pink-50 border border-pink-200 rounded-xl text-xs md:text-sm font-semibold text-rose-700 flex items-center space-x-2 animate-fade-in shadow-sm';
+        note.innerHTML = `<i class="fa-solid fa-heart text-rose-500"></i><span>${msg}</span>`;
+        list.appendChild(note);
+
+        if (caughtHeartsCount === loveMessages.length) {
+          clearInterval(heartSpawnInterval);
+          document.getElementById('specialRewardBox').classList.remove('hidden');
+          confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+        }
+      }
+    }
+
+    function goToGame2() {
+      document.getElementById('resultScreen').classList.add('hidden');
+      document.getElementById('game2Screen').classList.remove('hidden');
+      initGame2();
+    }
+
+    function backToResult() {
+      document.getElementById('game2Screen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.remove('hidden');
+      clearInterval(heartSpawnInterval);
+    }
+
+    function goToGame3() {
+      document.getElementById('game2Screen').classList.add('hidden');
+      document.getElementById('game3Screen').classList.remove('hidden');
+      initGame3();
+    }
+
+    function backToGame2() {
+      document.getElementById('game3Screen').classList.add('hidden');
+      document.getElementById('game2Screen').classList.remove('hidden');
+    }
+
+    /* ===================================================
+       4. GAME 3: TEBAK HADIAH AKHIR LOGIC
+       =================================================== */
+
+    const giftOptions = [
+      {
+        title: "Jajan Mochi 🍡",
+        icon: "🍡",
+        desc: "Traktiran Jajan Mochi kenyal & varian manis sepuasnya bareng aku!",
+        msg: "Sayang, aku dapet hadiah Jajan Mochi nih dari kuis! Yuk jajan mochi bareng! 🍡❤️"
+      },
+      {
+        title: "Boba & Popcorn 🧋🍿",
+        icon: "🧋",
+        desc: "Paket kencan hemat & nikmat: Minum Boba rasa favorit sambil ngemil popcorn!",
+        msg: "Ayang! Aku dapet Voucher Boba & Popcorn Time dari kuis. Kapan kita jajan? 🧋✨"
+      },
+      {
+        title: "Jalan-Jalan & Es Krim 🍦",
+        icon: "🍦",
+        desc: "Jalan-jalan sore santai + beli Es Krim rasa kesukaan kamu!",
+        msg: "Haii sayang! Aku dapet hadiah Jalan-jalan & Es Krim. Beli es krim yuk! 🍦💕"
+      },
+      {
+        title: "Voucher Peluk 10x 🫂",
+        icon: "🫂",
+        desc: "Bisa diklaim kapan aja! Bebas minta peluk & usel-usel hangat 10x tanpa batas!",
+        msg: "Ayang, aku menang Voucher Peluk & Usel 10x nih! Mau klaim sekarang dong! 🫂❤️"
+      },
+      {
+        title: "Makan Malam Romantis 🕯️",
+        icon: "🍽️",
+        desc: "Dinner romantis makan makanan kesukaan kita berdua!",
+        msg: "Sayang! Aku dapet hadiah Makan Malam Romantis nih. Boleh tagih sekarang ga? 🕯️💖"
+      },
+      {
+        title: "Movie Night & Snacking 🎬",
+        icon: "🎬",
+        desc: "Nonton film/anime favorit bareng sambil disiapin camilan seru!",
+        msg: "Ayang, aku dapet Voucher Movie Night & Snacking! Yuk agendakan nonton bareng! 🍿🎬"
+      }
+    ];
+
+    function initGame3() {
+      const grid = document.getElementById('giftBoxesGrid');
+      const claimCard = document.getElementById('giftClaimCard');
+      grid.innerHTML = '';
+      grid.classList.remove('hidden');
+      claimCard.classList.add('hidden');
+
+      // Shuffle options copy
+      const shuffled = [...giftOptions].sort(() => 0.5 - Math.random());
+
+      shuffled.forEach((gift, idx) => {
+        const box = document.createElement('button');
+        box.className = "p-5 bg-white hover:bg-rose-50 border-2 border-purple-200 hover:border-purple-400 rounded-2xl shadow-md transition-all transform hover:-translate-y-1 active:translate-y-0 flex flex-col items-center justify-center space-y-2 group cursor-pointer";
+        box.onclick = () => revealGift(gift, box);
+        box.innerHTML = `
+          <div class="text-4xl md:text-5xl group-hover:scale-110 transition-transform animate-pulse">🎁</div>
+          <span class="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded-full">Kotak #${idx + 1}</span>
+        `;
+        grid.appendChild(box);
+      });
+    }
+
+    function revealGift(gift, boxElement) {
+      playSound('correct');
+
+      const grid = document.getElementById('giftBoxesGrid');
+      const claimCard = document.getElementById('giftClaimCard');
+
+      grid.classList.add('hidden');
+
+      // Set Card Details
+      document.getElementById('rewardIcon').innerText = gift.icon;
+      document.getElementById('rewardTitle').innerText = gift.title;
+      document.getElementById('rewardDesc').innerText = gift.desc;
+
+      // WhatsApp Claim Link with direct target phone number
+      const encodedMsg = encodeURIComponent(gift.msg);
+      document.getElementById('waClaimBtn').href = `https://wa.me/62895327577152?text=${encodedMsg}`;
+
+      claimCard.classList.remove('hidden');
+
+      // Confetti burst
+      confetti({
+        particleCount: 100,
+        spread: 90,
+        origin: { y: 0.5 }
+      });
+    }
+
+    function resetGiftBoxes() {
+      initGame3();
+    }
+
+    /* ===================================================
+       5. MODAL SURPRISE
+       =================================================== */
+
+    function openFinalSurpriseModal() {
+      playSound('correct');
+      const modal = document.getElementById('surpriseModal');
+      const modalContent = document.getElementById('modalContent');
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modalContent.classList.remove('scale-95', 'opacity-0');
+        modalContent.classList.add('scale-100', 'opacity-100');
+      }, 50);
+
+      confetti({ particleCount: 120, spread: 100, origin: { y: 0.4 } });
+    }
+
+    function closeSurpriseModal() {
+      const modal = document.getElementById('surpriseModal');
+      const modalContent = document.getElementById('modalContent');
+      modalContent.classList.remove('scale-100', 'opacity-100');
+      modalContent.classList.add('scale-95', 'opacity-0');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300);
+    }
+
+    /* Initialize on Load */
+    window.onload = function() {
+      createBgHearts();
+    };
+  </script>
+</body>
+</html>
